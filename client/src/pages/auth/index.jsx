@@ -12,7 +12,7 @@ import { useAppStore } from "@/store";
 
 const Auth = () => {
   const navigate = useNavigate();
-  const {setUserInfo} = useAppStore();
+  const { setUserInfo } = useAppStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -44,19 +44,43 @@ const Auth = () => {
     return true;
   };
 
+  // const handleLogin = async () => {
+  //   if (validateLogin()) {
+  //     const response = await apiClient.post(
+  //       LOGIN_ROUTE,
+  //       { email, password },
+  //       { withCredentials: true }
+  //     );
+  //     if(response.data.user.id){
+  //       setUserInfo(response.data.user);
+  //       if(response.data.user.profileSetup) navigate("/chat")
+  //         else navigate("/profile")
+  //     }
+  //     console.log({ response });
+  //   }
+  // };
+
   const handleLogin = async () => {
     if (validateLogin()) {
-      const response = await apiClient.post(
-        LOGIN_ROUTE,
-        { email, password },
-        { withCredentials: true }
-      );
-      if(response.data.user.id){
-        setUserInfo(response.data.user);
-        if(response.data.user.profileSetup) navigate("/chat")
-          else navigate("/profile")
+      try {
+        const response = await apiClient.post(
+          LOGIN_ROUTE,
+          { email, password },
+          { withCredentials: true }
+        );
+
+        if (response.status === 200 && response.data.user) {
+          setUserInfo(response.data.user);
+          if (response.data.user.profileSetup) navigate("/chat");
+          else navigate("/profile");
+        }
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          toast.error("Incorrect Password, please try again.");
+        } else {
+          toast.error("Incorrect Password. Please try again.");
+        }
       }
-      console.log({ response });
     }
   };
 
@@ -67,7 +91,7 @@ const Auth = () => {
         { email, password },
         { withCredentials: true }
       );
-      if(response.status === 201){
+      if (response.status === 201) {
         setUserInfo(response.data.user);
         navigate("/profile");
       }

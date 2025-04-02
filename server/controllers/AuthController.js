@@ -1,6 +1,7 @@
 import { compare } from "bcrypt";
 import User from "../models/UserModel.js";
 import jwt from "jsonwebtoken";
+// import { toast } from "sonner";
 import { renameSync, unlinkSync } from "fs";
 const tokenExpiry = 3 * 24 * 60 * 60 * 1000;
 
@@ -34,6 +35,43 @@ export const signup = async (request, response, next) => {
     return response.status(500).send("Internal Server Error");
   }
 };
+
+// export const signup = async (request, response, next) => {
+//   try {
+//     const { email, password } = request.body;
+//     if (!email || !password) {
+//       return response.status(400).send("Email and Password are required.");
+//     }
+
+//     // Password validation: Must contain an uppercase letter, a special character, and a number
+//     const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+
+//     if (!passwordRegex.test(password)) {
+//       return toast.error(
+//         "Password must be at least 8 characters long and contain at least one uppercase letter, one special character, and one number."
+//       );
+//     }
+
+//     const user = await User.create({ email, password });
+//     response.cookie("jwt", createToken(email, user.id), {
+//       tokenExpiry,
+//       secure: true,
+//       sameSite: "None",
+//     });
+
+//     return response.status(201).json({
+//       user: {
+//         id: user.id,
+//         email: user.email,
+//         profileSetup: user.profileSetup,
+//       },
+//     });
+//   } catch (error) {
+//     console.log({ error });
+//     return response.status(500).send("Internal Server Error");
+//   }
+// };
+
 
 export const login = async (request, response, next) => {
   try {
@@ -134,7 +172,7 @@ export const addProfileImage = async (request, response, next) => {
 
     const date = Date.now();
     let fileName = "uploads/profiles" + date + request.file.originalname;
-    renameSync(request.file.path, fileName);
+     (request.file.path, fileName);
 
     const updatedUser = await User.findByIdAndUpdate(
       request.userId,
@@ -160,10 +198,18 @@ export const removeProfileImage = async (request, response, next) => {
       return response.status(404).send("User not found")
     }
 
-    if(user.image){
-      unlinkSync(user.image)
-    }
+    // if(user.image){
+    //   unlinkSync(user.image)
+    // }
 
+    if (user.image) {
+      try {
+        unlinkSync(user.image);
+      } catch (err) {
+        console.error("Error deleting file:", err);
+      }
+    }
+    
     user.image = null;
     await user.save();
     
@@ -173,3 +219,17 @@ export const removeProfileImage = async (request, response, next) => {
     return response.status(500).send("Internal Server Error");
   }
 };
+
+
+export const logout = async (request, response, next) => {
+  try {
+    
+    response.cookie("jwt","",{tokenExpiry:1,secure:true, sameSite:"None"})
+    
+    return response.status(200).send("You have been logged out.");
+  } catch (error) {
+    console.log({ error });
+    return response.status(500).send("Internal Server Error");
+  }
+};
+
