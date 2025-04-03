@@ -2,7 +2,7 @@ import { useAppStore } from "@/store";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoArrowBack } from "react-icons/io5";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+// import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { colors, getColor } from "@/lib/utils";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import {
   REMOVE_PROFILE_IMAGE_ROUTE,
   UPDATE_PROFILE_ROUTE,
 } from "@/utils/constants";
+import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -26,33 +27,33 @@ const Profile = () => {
   const [selectedColor, setSelectedColor] = useState(0);
   const fileInputRef = useRef(null);
 
-  useEffect(() => {
-    if (userInfo.profileSetup) {
-      setFirstName(userInfo.firstName);
-      setLastName(userInfo.lastName);
-      setSelectedColor(userInfo.color);
-    }
-    if (userInfo.image) {
-      setImage(`${HOST}/${userInfo.image}`);
-    }
-  }, [userInfo]);
   // useEffect(() => {
   //   if (userInfo.profileSetup) {
   //     setFirstName(userInfo.firstName);
   //     setLastName(userInfo.lastName);
   //     setSelectedColor(userInfo.color);
   //   }
-
-  //   // Ensure image persists even when navigating back
   //   if (userInfo.image) {
-  //     const imageUrl = userInfo.image.startsWith("http")
-  //       ? userInfo.image
-  //       : `${HOST}/${userInfo.image}`;
-  //     setImage(imageUrl);
-  //   } else {
-  //     setImage(null); // Ensure the state resets properly
+  //     setImage(`${HOST}/${userInfo.image}`);
   //   }
   // }, [userInfo]);
+
+  useEffect(() => {
+    const storedUserInfo = JSON.parse(localStorage.getItem("userInfo"));
+    if (storedUserInfo) {
+      setUserInfo(storedUserInfo);
+    }
+
+    if (userInfo.profileSetup) {
+      setFirstName(userInfo.firstName);
+      setLastName(userInfo.lastName);
+      setSelectedColor(userInfo.color);
+    }
+
+    if (userInfo.image) {
+      setImage(`${HOST}/${userInfo.image}`);
+    }
+  }, [userInfo]);
 
   const validateProfile = () => {
     if (!firstName) {
@@ -105,7 +106,7 @@ const Profile = () => {
       formData.append("profile-image", file);
       const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, {
         withCredentials: true,
-      });   
+      });
       if (response.status === 200 && response.data.image) {
         setUserInfo({ ...userInfo, image: response.data.image });
         toast.success("Image updated successfully.");
@@ -162,7 +163,7 @@ const Profile = () => {
                   {firstName
                     ? firstName.split("").shift()
                     : userInfo.email.split("").shift()}
-                </div>  
+                </div>
               )}
             </Avatar>
             {hovered && (

@@ -13,14 +13,16 @@ export const searchContacts = async (request, response, next) => {
       "\\$&"
     );
 
-    const regex = new Regex(sanitizedSearchTerm, "i");
+    const regex = new RegExp(sanitizedSearchTerm, "i");
 
     const contacts = await User.find({
-        $and:[
-            {_id:{$ne:request.userId}}
-        ]
-
+      $and: [
+        { _id: { $ne: request.userId } },
+        { $or: [{ firstName: regex }, { lastName: regex }, { email: regex }] },
+      ],
     });
+
+    return response.status(200).json({contacts});
 
     return response.status(200).send("You have been logged out.");
   } catch (error) {
