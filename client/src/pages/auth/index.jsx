@@ -44,45 +44,45 @@ const Auth = () => {
     return true;
   };
 
-  // const handleLogin = async () => {
-  //   if (validateLogin()) {
-  //     const response = await apiClient.post(
-  //       LOGIN_ROUTE,
-  //       { email, password },
-  //       { withCredentials: true }
-  //     );
-  //     if(response.data.user.id){
-  //       setUserInfo(response.data.user);
-  //       if(response.data.user.profileSetup) navigate("/chat")
-  //         else navigate("/profile")
-  //     }
-  //     console.log({ response });
-  //   }
-  // };
-
   const handleLogin = async () => {
     if (validateLogin()) {
-      try {
-        const response = await apiClient.post(
-          LOGIN_ROUTE,
-          { email, password },
-          { withCredentials: true }
-        );
-
-        if (response.status === 200 && response.data.user) {
-          setUserInfo(response.data.user);
-          if (response.data.user.profileSetup) navigate("/chat");
-          else navigate("/profile");
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          toast.error("Incorrect Password, please try again.");
-        } else {
-          toast.error("Incorrect Password. Please try again.");
-        }
+      const response = await apiClient.post(
+        LOGIN_ROUTE,
+        { email, password },
+        { withCredentials: true }
+      );
+      if(response.data.user.id){
+        setUserInfo(response.data.user);
+        if(response.data.user.profileSetup) navigate("/chat")
+          else navigate("/profile")
       }
+      console.log({ response });
     }
   };
+
+  // const handleLogin = async () => {
+  //   if (validateLogin()) {
+  //     try {
+  //       const response = await apiClient.post(
+  //         LOGIN_ROUTE,
+  //         { email, password },
+  //         { withCredentials: true }
+  //       );
+
+  //       if (response.status === 200 && response.data.user) {
+  //         setUserInfo(response.data.user);
+  //         if (response.data.user.profileSetup) navigate("/chat");
+  //         else navigate("/profile");
+  //       }
+  //     } catch (error) {
+  //       if (error.response && error.response.status === 401) {
+  //         toast.error("Incorrect Password, please try again.");
+  //       } else {
+  //         toast.error("Incorrect Password. Please try again.");
+  //       }
+  //     }
+  //   }
+  // };
 
   const handleSignup = async () => {
     if (validateSignup()) {
