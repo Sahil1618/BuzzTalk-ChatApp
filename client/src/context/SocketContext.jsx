@@ -33,7 +33,7 @@ export const SocketProvider = ({ children }) => {
             selectedChatData._id === message.recipient._id)
         ) {
           console.log("message received", message);
-          
+
           addMessage(message);
         }
       };
